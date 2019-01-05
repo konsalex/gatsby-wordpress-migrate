@@ -17,6 +17,10 @@
     "tool",
     "blog"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/konsalex/gatsby-wordpress-migrate"
+  },
   "author": "Costa Alexoglou <konsalexee@gmail.com>",
   "license": "MIT",
   "dependencies": {
