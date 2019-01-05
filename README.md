@@ -5,8 +5,10 @@
   gatsby-wordpress-migrate
 </h1>
 
+![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
 ![](https://img.shields.io/apm/l/gatsby-wordpress-migrate.svg)
 ![](https://img.shields.io/github/languages/top/badges/gatsby-wordpress-migrate.svg)
+
 
 Migrate from Wordpress without pain! 
 
@@ -42,7 +44,7 @@ wordpress2gatsby <XML filename> <destination folder>
 
 ## 🤟 Help it grow
 
-You can jump in and contribute directly or file an issue in order to start exploring more opportunities/edge cases.
+You can jump in and contribute directly or file an issue in order to start exploring more opportunities/edge cases
 
 To file the issue just follow the instructions 📃
 
