@@ -1,0 +1,34 @@
+{
+  "name": "gatsby-wordpress-migrate",
+  "version": "1.0.0",
+  "description": "Simple Node Script for converting Wordpress XML export of Posts to Gatsby blogposts 🤟",
+  "main": "cli.js",
+  "bin": {
+    "wordpress2gatsby": "./cli.js"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "gatsby",
+    "wordpress",
+    "migrate",
+    "js",
+    "tool",
+    "blog"
+  ],
+  "author": "Costa Alexoglou <konsalexee@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "2.4.1",
+    "cheerio": "1.0.0-rc.2",
+    "fs-extra": "7.0.1",
+    "moment": "2.23.0",
+    "node-fetch": "2.3.0",
+    "turndown": "5.0.1",
+    "xml2js": "0.4.19"
+  },
+  "devDependencies": {
+    "jest": "23.6.0"
+  }
+}
