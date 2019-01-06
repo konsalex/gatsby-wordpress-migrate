@@ -6,8 +6,8 @@
 </h1>
 
 ![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
-![](https://img.shields.io/apm/l/gatsby-wordpress-migrate.svg)
-![](https://img.shields.io/github/languages/top/badges/gatsby-wordpress-migrate.svg)
+![](https://img.shields.io/npm/l/gatsby-wordpress-migrate.svg)
+![](https://img.shields.io/npm/dw/gatsby-wordpress-migrate.svg)
 
 
 Migrate from Wordpress without pain! 
