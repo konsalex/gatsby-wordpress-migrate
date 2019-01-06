@@ -22,7 +22,7 @@ With `gatsby-wordpress-migrate` you can convert all your wordpress posts to gats
 **Install** this package globally or to your project with npm or yarn.
 
 ```sh
-# create a new Gatsby site using the blog starter
+# Install gatsby-wordpress-migrate with yarn and make it a dev dependency
 yarn add -D gatsby-wordpress-migrate
 ```
 
