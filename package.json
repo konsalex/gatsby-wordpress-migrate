@@ -24,6 +24,7 @@
   "author": "Costa Alexoglou <konsalexee@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@sindresorhus/slugify": "^0.7.0",
     "chalk": "2.4.1",
     "cheerio": "1.0.0-rc.2",
     "fs-extra": "7.0.1",
