@@ -55,7 +55,8 @@ const writing = (post, title, images, destination) => {
   // Fetching the Images from the URLs
   images.forEach(async image => {
     try {
-      const imageResponse = fetch(image.url).then(res => {
+      // Here I encode URI in order to convert Unescaped Characters
+      const imageResponse = fetch(encodeURI(image.url)).then(res => {
         const file = fs.createWriteStream(
           `${srcPath}/${image.fileName}`
         );
