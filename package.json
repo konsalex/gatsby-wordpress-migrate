@@ -6,6 +6,9 @@
   "bin": {
     "wordpress2gatsby": "./cli.js"
   },
+  "engines" : {
+    "node" : ">=7"
+  },
   "scripts": {
     "test": "jest"
   },

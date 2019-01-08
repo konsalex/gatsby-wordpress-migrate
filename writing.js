@@ -1,6 +1,7 @@
 const fs = require("fs-extra");
 const fetch = require("node-fetch");
 const slugify = require('@sindresorhus/slugify');
+const URL = require('url').URL
 var path = require("path");
 
 // Custom Styling for Command Line printing
@@ -55,7 +56,7 @@ const writing = (post, title, images, destination) => {
   // Fetching the Images from the URLs
   images.forEach(async image => {
     try {
-      const imageResponse = fetch(image.url).then(res => {
+      const imageResponse = fetch(new URL(image.url)).then(res => {
         const file = fs.createWriteStream(
           `${srcPath}/${image.fileName}`
         );
