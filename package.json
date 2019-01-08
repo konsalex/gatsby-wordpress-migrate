@@ -1,6 +1,6 @@
 {
   "name": "gatsby-wordpress-migrate",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple Node Script for converting Wordpress XML export of Posts to Gatsby blogposts 🤟",
   "main": "cli.js",
   "bin": {
