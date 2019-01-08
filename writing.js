@@ -1,5 +1,6 @@
 const fs = require("fs-extra");
 const fetch = require("node-fetch");
+const slugify = require('@sindresorhus/slugify');
 var path = require("path");
 
 // Custom Styling for Command Line printing
@@ -17,7 +18,7 @@ const error = chalk.bold.red;
 
 const writing = (post, title, images, destination) => {
   // Converting the title to the proper folder name
-  const dirTitle = title.toLowerCase().replace(/\ /g, "-");
+  const dirTitle = slugify(title);
 
   destination = path.isAbsolute(destination)
     ? destination
