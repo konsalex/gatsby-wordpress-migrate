@@ -5,8 +5,10 @@
   gatsby-wordpress-migrate
 </h1>
 
-![](https://img.shields.io/apm/l/gatsby-wordpress-migrate.svg)
-![](https://img.shields.io/github/languages/top/badges/gatsby-wordpress-migrate.svg)
+![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
+![](https://img.shields.io/npm/l/gatsby-wordpress-migrate.svg)
+![](https://img.shields.io/npm/dw/gatsby-wordpress-migrate.svg)
+
 
 Migrate from Wordpress without pain! 
 
@@ -20,7 +22,7 @@ With `gatsby-wordpress-migrate` you can convert all your wordpress posts to gats
 **Install** this package globally or to your project with npm or yarn.
 
 ```sh
-# create a new Gatsby site using the blog starter
+# Install gatsby-wordpress-migrate with yarn and make it a dev dependency
 yarn add -D gatsby-wordpress-migrate
 ```
 
@@ -42,7 +44,7 @@ wordpress2gatsby <XML filename> <destination folder>
 
 ## 🤟 Help it grow
 
-You can jump in and contribute directly or file an issue in order to start exploring more opportunities/edge cases.
+You can jump in and contribute directly or file an issue in order to start exploring more opportunities/edge cases
 
 To file the issue just follow the instructions 📃
 
