@@ -1,7 +1,7 @@
 import cheerio from 'cheerio';
 import TurndownService from 'turndown';
 import chalk from 'chalk';
-import { get, findIndex } from 'lodash';
+import { get, findIndex, find } from 'lodash';
 
 import writing from './writing';
 
@@ -53,10 +53,28 @@ turndownService.addRule('strong', {
 
 // Strong tag fixes
 turndownService.addRule('span', {
-  filter: 'span',
-  replacement(content) {
-    console.log(content);
-    return `*${content}*`;
+  filter(node) {
+    // if (node.nodeName === 'SPAN') {
+    //   console.log('..........');
+    //   console.log(node);
+    //   console.log(
+    //     node.tagName,
+    //     [...node.attributes]
+    //       .map(({ value, name }) => `${name}=${value}`)
+    //       .join(),
+    //   );
+    //   console.log(node.attributes[0]);
+    //   console.log(node.attributes[0].value);
+    //   console.log('..........');
+    // }
+    return node.nodeName === 'SPAN' && get(node, 'attributes[0].value');
+  },
+  replacement(content, node) {
+    // console.log('-------');
+    // console.log(content);
+    // console.log(node);
+    // console.log('-------');
+    return `<span style="${node.attributes[0].value}">${content}</span>`;
   },
 });
 
@@ -132,7 +150,7 @@ const dataWrangle = async (data, destination) => {
     console.log(images);
     console.log(header);
 
-    // return writing(header, images, content, destination);
+    return writing(header, images, content, destination);
   });
 };
 
