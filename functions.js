@@ -54,26 +54,9 @@ turndownService.addRule('strong', {
 // Strong tag fixes
 turndownService.addRule('span', {
   filter(node) {
-    // if (node.nodeName === 'SPAN') {
-    //   console.log('..........');
-    //   console.log(node);
-    //   console.log(
-    //     node.tagName,
-    //     [...node.attributes]
-    //       .map(({ value, name }) => `${name}=${value}`)
-    //       .join(),
-    //   );
-    //   console.log(node.attributes[0]);
-    //   console.log(node.attributes[0].value);
-    //   console.log('..........');
-    // }
     return node.nodeName === 'SPAN' && get(node, 'attributes[0].value');
   },
   replacement(content, node) {
-    // console.log('-------');
-    // console.log(content);
-    // console.log(node);
-    // console.log('-------');
     return `<span style="${node.attributes[0].value}">${content}</span>`;
   },
 });
@@ -101,17 +84,6 @@ const dataWrangle = async (data, destination) => {
   // Iterate in every Post
   data.rss.channel[0].item.map((post, index) => {
     log(progress(`Currently Parsing Post No: ${index + 1}`));
-    // console.log(post);
-    let content = post['content:encoded'][0];
-    const images = parseImages(content);
-    images.forEach(image => {
-      content = content.replace(
-        new RegExp(image.url, 'g'),
-        `./${image.fileName}`,
-      );
-    });
-
-    content = turndownService.turndown(content);
 
     const getMeta = (key, defaultMeta = undefined) => {
       const metaIndex = findIndex(
@@ -122,6 +94,29 @@ const dataWrangle = async (data, destination) => {
         ? get(post, `['wp:postmeta'][${metaIndex}]['wp:meta_value'][0]`)
         : defaultMeta;
     };
+
+    let content = post['content:encoded'][0];
+    let images = parseImages(content);
+    images.forEach(image => {
+      content = content.replace(
+        new RegExp(image.url, 'g'),
+        `./${image.fileName}`,
+      );
+    });
+
+    const thumbnail = getMeta('essb_cached_image');
+    images =
+      thumbnail !== undefined
+        ? [
+            {
+              url: thumbnail,
+              fileName: thumbnail.substring(thumbnail.lastIndexOf('/') + 1),
+            },
+            ...images,
+          ]
+        : images;
+
+    content = turndownService.turndown(content);
 
     const header = {
       title: `'${get(post, 'title[0]')}'`,
@@ -135,7 +130,9 @@ const dataWrangle = async (data, destination) => {
       ),
       excerpt: `'${get(post, `['excerpt:encoded'][0]`)}'`,
       draft: get(post, `['wp:status'][0]`) !== 'publish',
-      thumbnail: getMeta('essb_cached_image'),
+      thumbnail:
+        thumbnail !== undefined &&
+        `./${thumbnail.substring(thumbnail.lastIndexOf('/') + 1)}`,
       meta_title: getMeta('_yoast_wpseo_title', get(post, 'title[0]')),
       meta_desc: getMeta(
         '_yoast_wpseo_metadesc',
