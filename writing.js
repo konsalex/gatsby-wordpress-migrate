@@ -1,38 +1,34 @@
-const fs = require("fs-extra");
-const fetch = require("node-fetch");
-const slugify = require('@sindresorhus/slugify');
-var path = require("path");
+import fs from 'fs-extra';
+import fetch from 'node-fetch';
+import path from 'path';
 
 // Custom Styling for Command Line printing
-const chalk = require("chalk");
+import chalk from 'chalk';
+
 const success = chalk.bold.green.inverse;
-const log = console.log;
+const { log } = console;
 const error = chalk.bold.red;
 
-/* writing
- * post: the content of the post converted to the proper markdown
- * title: the title of the post
- * images:  [{url: <URL of the image>, fileName: <The UUID name generated>},...]
- * destination: the destination folder
+/** writing.js
+ * header: {title, slug, author, tags...}
+ * images:  [{fileName, alt, ...}, ...]
+ * content: the content of the post converted to the proper markdown
+ * dest: the destination folder
  */
 
-const writing = (post, title, images, destination) => {
-  // Converting the title to the proper folder name
-  const dirTitle = slugify(title);
-
-  destination = path.isAbsolute(destination)
-    ? destination
-    : [process.cwd(), path.normalize(destination)].join("/");
+const writing = (header, images, content, dest) => {
+  const destination = path.isAbsolute(dest)
+    ? dest
+    : [process.cwd(), path.normalize(dest)].join('/');
 
   // Create the destination folder exists
   if (!fs.existsSync(destination)) {
     fs.mkdirSync(destination);
   }
 
-  const finalDestinationFolder = [destination, dirTitle].join("/");
+  const finalDestinationFolder = [destination, header.slug].join('/');
 
-  let srcPath = "";
-
+  let srcPath = '';
 
   // Create the proper folder structure for the unique post
   if (!fs.existsSync(finalDestinationFolder)) {
@@ -43,29 +39,32 @@ const writing = (post, title, images, destination) => {
     srcPath = finalDestinationFolder + random;
     fs.mkdirSync(srcPath);
   }
+  const post = `---\n${Object.keys(header).reduce(
+    (acc, key) => `${acc}${key}: ${header[key]}\n`,
+    '',
+  )}---\n\n${content}`;
+  console.log(post);
 
   // Writing the markdowns inside the folders
-  fs.outputFile(`${srcPath}/index.md`, post, function(err) {
+  fs.outputFile(`${srcPath}/index.md`, post, err => {
     if (err) {
       return log(error(err));
     }
-    log(success(`The post ${title} was successfully converted.`));
+    return log(success(`The post ${header.title} was successfully converted.`));
   });
 
   // Fetching the Images from the URLs
-  images.forEach(async image => {
+  return images.forEach(async image => {
     try {
       // Here I encode URI in order to convert Unescaped Characters
-      const imageResponse = fetch(encodeURI(image.url)).then(res => {
-        const file = fs.createWriteStream(
-          `${srcPath}/${image.fileName}`
-        );
+      return fetch(encodeURI(image.url)).then(res => {
+        const file = fs.createWriteStream(`${srcPath}/${image.fileName}`);
         res.body.pipe(file);
       });
     } catch (err) {
-      log(error(err));
+      return log(error(err));
     }
   });
 };
 
-module.exports = writing;
+export default writing;

@@ -1,47 +1,39 @@
-#!/usr/bin/env node
+#!/usr/bin/env node -r esm
 
-// FS-Extra in order to enable promises
-const fs = require("fs");
-const path = require("path");
-const args = process.argv;
-const parser = require('xml2js');
-// Custom Styling for Command Line printing
-const log = console.log;
-const chalk = require("chalk");
+import fs from 'fs';
+import parser from 'xml2js';
+import chalk from 'chalk';
+import helperFunctions from './functions';
+
 const error = chalk.bold.red;
 const success = chalk.bold.green.inverse;
-const helperFunctions = require("./functions");
+const { log } = console;
 
-
-const cli = async () => {
+(() => {
+  const args = process.argv;
   if (args.length < 4) {
+    log(error(`We expect two arguments \n1: Input file \n2:Export directory`));
     log(
-      error(
-        "We expect two arguments \n1: Input file \n2:Export directory as second."
-      )
+      error('Example:   ') +
+        success('gatsby2wordpress wordpressdata.xml blogposts'),
     );
-    log(
-      error("Example:   ") +
-        success("gatsby2wordpress wordpressdata.xml blogposts")
-    );
-    process.exit();
+    return null;
   }
 
   const inputFilePath = args[2];
   const outputDir = args[3];
 
   // Read the XML file and call DataWrangle after we parse it
-  fs.readFile(inputFilePath, function(err, data) {
-    if (err){
-      log(error(err));
-      process.exit();
+  return fs.readFile(inputFilePath, (err, data) => {
+    if (err) {
+      return log(error(err));
     }
-    parser.parseString(data, function(err, result) {
-      log(success("Successfully loaded file."));
-      helperFunctions.dataWrangle(result, outputDir);
+    return parser.parseString(data, (parseError, result) => {
+      if (parseError) {
+        return log(error(parseError));
+      }
+      log(success('Successfully loaded file.'));
+      return helperFunctions.dataWrangle(result, outputDir);
     });
   });
-
-};
-
-cli();
+})();

@@ -81,6 +81,8 @@ typings/
 
 .DS_Store
 .cache
-.eslintrc.js
-.prettierrc
 .travis.yml
+
+# Tests
+yo
+example/vb*
