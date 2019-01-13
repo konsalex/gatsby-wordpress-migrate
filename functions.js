@@ -74,10 +74,9 @@ const dataWrangle = async (data, destination) => {
     log(progress(`Currently Parsing Post No: ${index + 1}`));
     console.log(post);
     let content = post['content:encoded'][0];
-
     const images = parseImages(content);
     images.forEach(image => {
-      content = content.replace(image.url, image.fileName);
+      content = content.replace(new RegExp(image.url, 'g'), image.fileName);
     });
 
     content = turndownService.turndown(content);

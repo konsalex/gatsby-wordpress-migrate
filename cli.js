@@ -3,25 +3,34 @@
 import fs from 'fs';
 import parser from 'xml2js';
 import chalk from 'chalk';
+import inquirer from 'inquirer';
+
 import helperFunctions from './functions';
 
 const error = chalk.bold.red;
 const success = chalk.bold.green.inverse;
 const { log } = console;
 
-(() => {
+(async () => {
   const args = process.argv;
+  let infos = null;
   if (args.length < 4) {
-    log(error(`We expect two arguments \n1: Input file \n2:Export directory`));
-    log(
-      error('Example:   ') +
-        success('gatsby2wordpress wordpressdata.xml blogposts'),
-    );
-    return null;
+    infos = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'xml',
+        message: 'Wordpress XML file:',
+      },
+      {
+        type: 'input',
+        name: 'dest',
+        message: 'Destination for your new MarkDown folder:',
+      },
+    ]);
   }
 
-  const inputFilePath = args[2];
-  const outputDir = args[3];
+  const inputFilePath = infos ? infos.xml : args[2];
+  const outputDir = infos ? infos.dest : args[3];
 
   // Read the XML file and call DataWrangle after we parse it
   return fs.readFile(inputFilePath, (err, data) => {

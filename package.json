@@ -29,6 +29,7 @@
     "chalk": "2.4.1",
     "cheerio": "1.0.0-rc.2",
     "fs-extra": "^7.0.1",
+    "inquirer": "^6.2.1",
     "moment": "2.23.0",
     "node-fetch": "2.3.0",
     "turndown": "5.0.1",
