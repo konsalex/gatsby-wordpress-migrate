@@ -27,16 +27,16 @@ const writing = (header, images, content, dest) => {
 
   const finalDestinationFolder = [destination, header.slug].join('/');
 
-  let srcPath = '';
+  let srcPath = finalDestinationFolder;
 
   // Create the proper folder structure for the unique post
-  if (!fs.existsSync(finalDestinationFolder)) {
-    srcPath = finalDestinationFolder;
+  if (!header.slug) {
+    srcPath = `${destination}/draft.${shortid.generate()}`;
     fs.mkdirSync(srcPath);
-  } else {
-    srcPath = `${finalDestinationFolder}draft-${shortid.generate()}`;
+  } else if (!fs.existsSync(finalDestinationFolder)) {
     fs.mkdirSync(srcPath);
   }
+
   const post = `---\n${Object.keys(header).reduce(
     (acc, key) =>
       header[key] !== undefined ? `${acc}${key}: ${header[key]}\n` : acc,
@@ -51,6 +51,7 @@ const writing = (header, images, content, dest) => {
     return log(success(`The post ${header.title} was successfully converted.`));
   });
 
+  return null;
   // Fetching the Images from the URLs
   // Here I encode URI in order to convert Unescaped Characters
   log('Downloading images...');

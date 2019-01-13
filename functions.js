@@ -2,6 +2,7 @@ import cheerio from 'cheerio';
 import TurndownService from 'turndown';
 import chalk from 'chalk';
 import { get, findIndex } from 'lodash';
+import moment from 'moment';
 
 import writing from './writing';
 
@@ -119,25 +120,25 @@ const dataWrangle = async (data, destination) => {
     content = turndownService.turndown(content);
 
     const header = {
-      title: get(post, 'title[0]'),
-      date: get(post, 'pubDate[0]'),
-      author: get(post, `['dc:creator'][0]`),
-      slug: get(post, `['wp:post_name'][0]`),
-      tags: post.category.reduce(
-        (accumulator, current) =>
-          `${accumulator ? `${accumulator},` : ''}${current.$.nicename}`,
-        '',
-      ),
-      excerpt: get(post, `['excerpt:encoded'][0]`),
-      draft: get(post, `['wp:status'][0]`) !== 'publish',
-      thumbnail:
+      layout: 'post',
+      title: `"${get(post, 'title[0]')}"`,
+      image:
         thumbnail !== undefined &&
         `./${thumbnail.substring(thumbnail.lastIndexOf('/') + 1)}`,
-      meta_title: getMeta('_yoast_wpseo_title', get(post, 'title[0]')),
-      meta_desc: getMeta(
+      author: get(post, `['dc:creator'][0]`),
+      date: moment(get(post, 'pubDate[0]')).format(),
+      tags: post.category.reduce(
+        (accumulator, current) => [...accumulator, current._],
+        [],
+      ),
+      slug: get(post, `['wp:post_name'][0]`),
+      excerpt: `"${get(post, `['excerpt:encoded'][0]`)}"`,
+      draft: get(post, `['wp:status'][0]`) !== 'publish',
+      meta_title: `"${getMeta('_yoast_wpseo_title', get(post, 'title[0]'))}"`,
+      meta_desc: `"${getMeta(
         '_yoast_wpseo_metadesc',
         get(post, `['excerpt:encoded'][0]`),
-      ),
+      )}"`,
       twitter_shares: getMeta('essb_c_twitter'),
       facebook_shares: getMeta('essb_c_facebook'),
       kksr_ratings: getMeta('_kksr_ratings'),
