@@ -1,6 +1,8 @@
 import cheerio from 'cheerio';
 import TurndownService from 'turndown';
 import chalk from 'chalk';
+import { get } from 'lodash';
+
 import writing from './writing';
 
 // Custom Styling for Command Line printing
@@ -45,7 +47,7 @@ turndownService.addRule('code-tags', {
 turndownService.addRule('strong', {
   filter: 'strong',
   replacement(content) {
-    return `**${content.trim()}** `;
+    return `**${content.trim()}**`;
   },
 });
 
@@ -72,26 +74,37 @@ const dataWrangle = async (data, destination) => {
   // Iterate in every Post
   data.rss.channel[0].item.map((post, index) => {
     log(progress(`Currently Parsing Post No: ${index + 1}`));
-    console.log(post);
+    // console.log(post);
     let content = post['content:encoded'][0];
     const images = parseImages(content);
     images.forEach(image => {
-      content = content.replace(new RegExp(image.url, 'g'), image.fileName);
+      content = content.replace(
+        new RegExp(image.url, 'g'),
+        `./${image.fileName}`,
+      );
     });
 
     content = turndownService.turndown(content);
 
     const header = {
-      title: `'${post.title[0]}'`,
-      date: post.pubDate[0],
-      author: post['dc:creator'][0],
-      slug: post['wp:post_name'][0],
+      title: `'${get(post, 'title[0]')}'`,
+      date: get(post, 'pubDate[0]'),
+      author: get(post, `['dc:creator'][0]`),
+      slug: get(post, `['wp:post_name'][0]`),
       tags: post.category.reduce(
         (accumulator, current) =>
           `${accumulator ? `${accumulator},` : ''}${current.$.nicename}`,
         '',
       ),
-      excerpt: `'${post['excerpt:encoded'][0]}'`,
+      excerpt: `'${get(post, `['excerpt:encoded'][0]`)}'`,
+      draft: get(post, `['wp:status'][0]`) !== 'publish',
+      seo_title: get(post, `['wp:postmeta'][23]['wp:meta_value'][0]`),
+      seo_desc: get(post, `['wp:postmeta'][24]['wp:meta_value'][0]`),
+      thumbnail: get(post, `['wp:postmeta'][34]['wp:meta_value'][0]`),
+      twitter_shares: get(post, `['wp:postmeta'][37]['wp:meta_value'][0]`),
+      facebook_shares: get(post, `['wp:postmeta'][40]['wp:meta_value'][0]`),
+      kksr_ratings: get(post, `['wp:postmeta'][72]['wp:meta_value'][0]`),
+      kksr_casts: get(post, `['wp:postmeta'][703]['wp:meta_value'][0]`),
     };
 
     console.log(images);

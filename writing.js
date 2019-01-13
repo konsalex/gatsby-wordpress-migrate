@@ -40,10 +40,10 @@ const writing = (header, images, content, dest) => {
     fs.mkdirSync(srcPath);
   }
   const post = `---\n${Object.keys(header).reduce(
-    (acc, key) => `${acc}${key}: ${header[key]}\n`,
+    (acc, key) =>
+      header[key] !== undefined ? `${acc}${key}: ${header[key]}\n` : acc,
     '',
   )}---\n\n${content}`;
-  console.log(post);
 
   // Writing the markdowns inside the folders
   fs.outputFile(`${srcPath}/index.md`, post, err => {
