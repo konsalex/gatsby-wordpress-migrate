@@ -1,7 +1,7 @@
 import cheerio from 'cheerio';
 import TurndownService from 'turndown';
 import chalk from 'chalk';
-import { get } from 'lodash';
+import { get, findIndex } from 'lodash';
 
 import writing from './writing';
 
@@ -51,6 +51,15 @@ turndownService.addRule('strong', {
   },
 });
 
+// Strong tag fixes
+turndownService.addRule('span', {
+  filter: 'span',
+  replacement(content) {
+    console.log(content);
+    return `*${content}*`;
+  },
+});
+
 /* parseImages(value)
  * value : The content of the post with all the tags inside
  * return : [{url: <URL of the image>, fileName: <The UUID name generated>},...]
@@ -86,6 +95,16 @@ const dataWrangle = async (data, destination) => {
 
     content = turndownService.turndown(content);
 
+    const getMeta = (key, defaultMeta = undefined) => {
+      const metaIndex = findIndex(
+        post['wp:postmeta'],
+        meta => meta['wp:meta_key'][0] === key,
+      );
+      return metaIndex !== -1
+        ? get(post, `['wp:postmeta'][${metaIndex}]['wp:meta_value'][0]`)
+        : defaultMeta;
+    };
+
     const header = {
       title: `'${get(post, 'title[0]')}'`,
       date: get(post, 'pubDate[0]'),
@@ -98,19 +117,22 @@ const dataWrangle = async (data, destination) => {
       ),
       excerpt: `'${get(post, `['excerpt:encoded'][0]`)}'`,
       draft: get(post, `['wp:status'][0]`) !== 'publish',
-      seo_title: get(post, `['wp:postmeta'][23]['wp:meta_value'][0]`),
-      seo_desc: get(post, `['wp:postmeta'][24]['wp:meta_value'][0]`),
-      thumbnail: get(post, `['wp:postmeta'][34]['wp:meta_value'][0]`),
-      twitter_shares: get(post, `['wp:postmeta'][37]['wp:meta_value'][0]`),
-      facebook_shares: get(post, `['wp:postmeta'][40]['wp:meta_value'][0]`),
-      kksr_ratings: get(post, `['wp:postmeta'][72]['wp:meta_value'][0]`),
-      kksr_casts: get(post, `['wp:postmeta'][703]['wp:meta_value'][0]`),
+      thumbnail: getMeta('essb_cached_image'),
+      meta_title: getMeta('_yoast_wpseo_title', get(post, 'title[0]')),
+      meta_desc: getMeta(
+        '_yoast_wpseo_metadesc',
+        get(post, `['excerpt:encoded'][0]`),
+      ),
+      twitter_shares: getMeta('essb_c_twitter'),
+      facebook_shares: getMeta('essb_c_facebook'),
+      kksr_ratings: getMeta('_kksr_ratings'),
+      kksr_casts: getMeta('_kksr_casts'),
     };
 
     console.log(images);
     console.log(header);
 
-    return writing(header, images, content, destination);
+    // return writing(header, images, content, destination);
   });
 };
 

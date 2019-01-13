@@ -84,5 +84,5 @@ typings/
 .travis.yml
 
 # Tests
-yo
+yo*
 example/vb*
