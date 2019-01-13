@@ -1,7 +1,7 @@
 import cheerio from 'cheerio';
 import TurndownService from 'turndown';
 import chalk from 'chalk';
-import { get, findIndex, find } from 'lodash';
+import { get, findIndex } from 'lodash';
 
 import writing from './writing';
 
@@ -119,7 +119,7 @@ const dataWrangle = async (data, destination) => {
     content = turndownService.turndown(content);
 
     const header = {
-      title: `'${get(post, 'title[0]')}'`,
+      title: get(post, 'title[0]'),
       date: get(post, 'pubDate[0]'),
       author: get(post, `['dc:creator'][0]`),
       slug: get(post, `['wp:post_name'][0]`),
@@ -128,7 +128,7 @@ const dataWrangle = async (data, destination) => {
           `${accumulator ? `${accumulator},` : ''}${current.$.nicename}`,
         '',
       ),
-      excerpt: `'${get(post, `['excerpt:encoded'][0]`)}'`,
+      excerpt: get(post, `['excerpt:encoded'][0]`),
       draft: get(post, `['wp:status'][0]`) !== 'publish',
       thumbnail:
         thumbnail !== undefined &&

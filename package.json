@@ -33,6 +33,7 @@
     "lodash": "^4.17.11",
     "moment": "2.23.0",
     "node-fetch": "2.3.0",
+    "shortid": "^2.2.14",
     "turndown": "5.0.1",
     "xml2js": "^0.4.19"
   },

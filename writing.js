@@ -1,8 +1,7 @@
 import fs from 'fs-extra';
 import fetch from 'node-fetch';
 import path from 'path';
-
-// Custom Styling for Command Line printing
+import shortid from 'shortid';
 import chalk from 'chalk';
 
 const success = chalk.bold.green.inverse;
@@ -35,8 +34,7 @@ const writing = (header, images, content, dest) => {
     srcPath = finalDestinationFolder;
     fs.mkdirSync(srcPath);
   } else {
-    const random = Math.floor(Math.random() * 100);
-    srcPath = finalDestinationFolder + random;
+    srcPath = `${finalDestinationFolder}draft-${shortid.generate()}`;
     fs.mkdirSync(srcPath);
   }
   const post = `---\n${Object.keys(header).reduce(
@@ -54,17 +52,17 @@ const writing = (header, images, content, dest) => {
   });
 
   // Fetching the Images from the URLs
-  return images.forEach(async image => {
-    try {
-      // Here I encode URI in order to convert Unescaped Characters
-      return fetch(encodeURI(image.url)).then(res => {
+  // Here I encode URI in order to convert Unescaped Characters
+  log('Downloading images...');
+  return images.forEach(async image =>
+    fetch(encodeURI(image.url))
+      .then(res => {
         const file = fs.createWriteStream(`${srcPath}/${image.fileName}`);
         res.body.pipe(file);
-      });
-    } catch (err) {
-      return log(error(err));
-    }
-  });
+        log(success(`The image ${image.url} was successfully downloaded.`));
+      })
+      .catch(err => log(error(err))),
+  );
 };
 
 export default writing;
