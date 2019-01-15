@@ -15,7 +15,7 @@ const error = chalk.bold.red;
  * dest: the destination folder
  */
 
-const writing = (header, images, content, dest) => {
+function writing(header, images, content, dest) {
   const destination = path.isAbsolute(dest)
     ? dest
     : [process.cwd(), path.normalize(dest)].join('/');
@@ -25,18 +25,20 @@ const writing = (header, images, content, dest) => {
     fs.mkdirSync(destination);
   }
 
-  const finalDestinationFolder = [destination, header.slug].join('/');
+  const finalDestinationFolder = [
+    destination,
+    header.title.replace('/', ' of '),
+  ].join('/');
 
   let srcPath = finalDestinationFolder;
 
   // Create the proper folder structure for the unique post
-  if (!header.slug) {
+  if (!header.title) {
     srcPath = `${destination}/draft.${shortid.generate()}`;
     fs.mkdirSync(srcPath);
   } else if (!fs.existsSync(finalDestinationFolder)) {
     fs.mkdirSync(srcPath);
   }
-
   const post = `---\n${Object.keys(header).reduce(
     (acc, key) =>
       header[key] !== undefined ? `${acc}${key}: ${header[key]}\n` : acc,
@@ -51,11 +53,10 @@ const writing = (header, images, content, dest) => {
     return log(success(`The post ${header.title} was successfully converted.`));
   });
 
-  return null;
   // Fetching the Images from the URLs
   // Here I encode URI in order to convert Unescaped Characters
   log('Downloading images...');
-  return images.forEach(async image =>
+  images.forEach(async image =>
     fetch(encodeURI(image.url))
       .then(res => {
         const file = fs.createWriteStream(`${srcPath}/${image.fileName}`);
@@ -64,6 +65,6 @@ const writing = (header, images, content, dest) => {
       })
       .catch(err => log(error(err))),
   );
-};
+}
 
 export default writing;

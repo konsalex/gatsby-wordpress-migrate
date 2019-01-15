@@ -122,31 +122,26 @@ const dataWrangle = async (data, destination) => {
     const header = {
       layout: 'post',
       title: `"${get(post, 'title[0]')}"`,
-      image:
-        thumbnail !== undefined &&
-        `./${thumbnail.substring(thumbnail.lastIndexOf('/') + 1)}`,
+      image: thumbnail
+        ? `./${thumbnail.substring(thumbnail.lastIndexOf('/') + 1)}`
+        : undefined,
       author: get(post, `['dc:creator'][0]`),
       date: moment(get(post, 'pubDate[0]')).format(),
-      tags: post.category.reduce(
-        (accumulator, current) => [...accumulator, current._],
-        [],
-      ),
-      slug: get(post, `['wp:post_name'][0]`),
-      excerpt: `"${get(post, `['excerpt:encoded'][0]`)}"`,
+      categories: `[${post.category.map(
+        (category, categoriesIndex) =>
+          `${categoriesIndex > 0 ? ' ' : ''}"${category._}"`,
+      )}]`,
+      slug: get(post, `['wp:post_name'][0]`) || undefined,
+      excerpt: get(post, `['excerpt:encoded'][0]`)
+        ? `"${get(post, `['excerpt:encoded'][0]`)}"`
+        : undefined,
       draft: get(post, `['wp:status'][0]`) !== 'publish',
       meta_title: `"${getMeta('_yoast_wpseo_title', get(post, 'title[0]'))}"`,
-      meta_desc: `"${getMeta(
-        '_yoast_wpseo_metadesc',
-        get(post, `['excerpt:encoded'][0]`),
-      )}"`,
       twitter_shares: getMeta('essb_c_twitter'),
       facebook_shares: getMeta('essb_c_facebook'),
       kksr_ratings: getMeta('_kksr_ratings'),
       kksr_casts: getMeta('_kksr_casts'),
     };
-
-    console.log(images);
-    console.log(header);
 
     return writing(header, images, content, destination);
   });
