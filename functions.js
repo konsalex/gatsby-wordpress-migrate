@@ -1,153 +1,63 @@
-const xml2js = require("xml2js");
-const cheerio = require("cheerio");
-const moment = require("moment");
-const fs = require("fs-extra");
-const uuid = require("uuid/v4");
-var TurndownService = require("turndown");
-const path = require("path");
-const url = require("url");
-const writing = require("./writing");
 
-// Custom Styling for Command Line printing
-const chalk = require("chalk");
-const success = chalk.bold.green.inverse;
-const log = console.log;
-const progress = chalk.yellow;
-const error = chalk.bold.red;
-
-var parser = new xml2js.Parser();
+const cheerio = require('cheerio');
+const { get, findIndex } = require('lodash');
+const chalk = require('chalk');
+const moment = require('moment');
+const TurndownService = require('turndown');
+const writing = require('./writing')
+const { log } = console;
+const { yellow: progress } = chalk;
 
 /* *********** Turndown Initializing ********** */
 
-var turndownService = new TurndownService({
-  headingStyle: "atx",
-  codeBlockStyle: "fenced"
+const turndownService = new TurndownService({
+  headingStyle: 'atx',
+  codeBlockStyle: 'fenced',
 });
 
 // Pre tag => PrismJS for gatsby plugin
-turndownService.addRule("pre-tags", {
-  filter: "pre",
-  replacement: function(content, node, options) {
+turndownService.addRule('pre-tags', {
+  filter: 'pre',
+  replacement(value) {
     // Remove Escape Characters from String
     // created by TurndownService.prototype.escape
     // Unfortenately node is private in Turndown.js
-    content = content.replace(/\\/g, "");
+    const content = value.replace(/\\/g, '');
 
     // Check if there is a Newline character to make the comment inline
-    if (content.split("\n").length > 1) {
-      return "\n```\n" + `${content}` + "\n```\n";
-    } else {
-      return " `" + content + "` ";
-    }
-  }
+    return content.split('\n').length > 1
+      ? `\n\`\`\`\n${content}\n\`\`\`\n`
+      : ` \`${content}\` `;
+  },
 });
 
 // Code tag => PrismJS for gatsby plugin
-turndownService.addRule("code-tags", {
-  filter: "code",
-  replacement: function(content) {
-    // Check if there is a Newline character to make the comment inline
-    if (content.split("\n").length > 1) {
-      return "\n```\n" + `${content}` + "\n```\n";
-    } else {
-      return " `" + content + "` ";
-    }
-  }
+turndownService.addRule('code-tags', {
+  filter: 'code',
+  replacement(content) {
+    return content.split('\n').length > 1
+      ? `\n\`\`\`\n${content}\n\`\`\`\n`
+      : ` \`${content}\` `;
+  },
+});
+
+// Strong tag fix es
+turndownService.addRule('strong', {
+  filter: 'strong',
+  replacement(content) {
+    return `**${content.trim()}**`;
+  },
 });
 
 // Strong tag fixes
-turndownService.addRule("strong", {
-  filter: "strong",
-  replacement: function(content) {
-    return "**" + content.trim() + "** ";
-  }
+turndownService.addRule('span', {
+  filter(node) {
+    return node.nodeName === 'SPAN' && get(node, 'attributes[0].value');
+  },
+  replacement(content, node) {
+    return `<span style="${node.attributes[0].value}">${content}</span>`;
+  },
 });
-
-/* ********************************************************** */
-
-/* PrismJS
- * Here the function is taking as input the content of the post
- * plus the parsed version of it in order to search fast and with ease tags that contain code.
- * The tag I have seen so far are with the following format : <pre args... > ... </pre>
- * For extra tags feel free to make an issue or add them.
- * Previous work for Classes Extraction (If requested I should check it again)
- */
-function prismJS(content, parsed) {
-  const tags = parsed("pre").contents();
-
-  for (let i = 0; i < tags.length; i++) {
-    const classes = tags[i].parent.attribs.class;
-
-    let language = "";
-
-    if (classes != undefined) {
-      language = classes.split(" ")[0].split(":")[1];
-    }
-
-    if (content.includes(tags[i].data)) {
-      log(progress("Changing the codeblock."));
-
-      const replaceString = "```" + `${language}\n${tags[i].data}\n` + "```";
-
-      parsed("pre")
-        .first()
-        .replaceWith(replaceString);
-    }
-  }
-  return parsed.text();
-}
-
-async function dataWrangle(data, destination) {
-  // Iterate in every Post
-  data.rss.channel[0].item.map((value, index) => {
-    /* For every post I need
-     * 1: Title
-     * 2: Publish Date
-     * 3: Creator
-     * 4: Content
-     */
-    log(progress(`Currently Parsing Post No: ${index + 1}`));
-    let content = value["content:encoded"][0];
-    const title = value.title[0];
-    const pubDate = moment(value.pubDate[0]).format("YYYY-MM-DD");
-    const slug = value["wp:post_name"][0];
-
-    // I am sure there must be an easier way and more concise here
-    let categories = [];
-    value.category.map(temp => categories.push(temp.$.nicename));
-    categories = categories.join(",");
-    // ////////////////////////////////
-
-    let author = value["dc:creator"][0];
-
-    const images = parseImages(content);
-    images.forEach(image => {
-      content = content.replace(image.url, image.fileName);
-    });
-
-    content = turndownService.turndown(content);
-
-    // Header of every index.md
-    const frontMatter = "---\n";
-    const titleMD = `title: ${title}\n`;
-    const date = `date: ${pubDate}\n`;
-    author = `author: ${author}\n`;
-    categories = `categories: ${categories}\n`;
-    // /////////////////////
-    const Output = [
-      frontMatter,
-      titleMD,
-      date,
-      author,
-      categories,
-      frontMatter,
-      "\n",
-      content
-    ].join("");
-
-    writing(Output,title, images, destination)
-  });
-}
 
 /* parseImages(value)
  * value : The content of the post with all the tags inside
@@ -156,20 +66,81 @@ async function dataWrangle(data, destination) {
 
 const parseImages = value => {
   const content = cheerio.load(value);
-  const imagesElements = content("img");
+  const imagesElements = content('img');
   const images = imagesElements
-    .map((index, item) => {
-      const imageName = uuid();
-      const imageUrl = item.attribs["src"];
-      const imageExtension = path.extname(url.parse(imageUrl).pathname);
-      return {
-        url: imageUrl,
-        fileName: `${imageName}${imageExtension}`
-      };
-    })
+    .map((index, { attribs: { src: imageURL, ...rest } }) => ({
+      fileName: imageURL.substring(imageURL.lastIndexOf('/') + 1),
+      url: imageURL,
+      ...rest,
+    }))
     .toArray();
-
   return images;
+};
+
+const dataWrangle = async (data, destination) => {
+  // Iterate in every Post
+  data.rss.channel[0].item.map((post, index) => {
+    log(progress(`Currently Parsing Post No: ${index + 1}`));
+
+    const getMeta = (key, defaultMeta = undefined) => {
+      const metaIndex = findIndex(
+        post['wp:postmeta'],
+        meta => meta['wp:meta_key'][0] === key,
+      );
+      return metaIndex !== -1
+        ? get(post, `['wp:postmeta'][${metaIndex}]['wp:meta_value'][0]`)
+        : defaultMeta;
+    };
+
+    let content = post['content:encoded'][0];
+    let images = parseImages(content);
+    images.forEach(image => {
+      content = content.replace(
+        new RegExp(image.url, 'g'),
+        `./${image.fileName}`,
+      );
+    });
+
+    const thumbnail = getMeta('essb_cached_image');
+    images =
+      thumbnail !== undefined
+        ? [
+            {
+              url: thumbnail,
+              fileName: thumbnail.substring(thumbnail.lastIndexOf('/') + 1),
+            },
+            ...images,
+          ]
+        : images;
+
+    content = turndownService.turndown(content);
+
+    const header = {
+      layout: 'post',
+      title: `"${get(post, 'title[0]')}"`,
+      image: thumbnail
+        ? `./${thumbnail.substring(thumbnail.lastIndexOf('/') + 1)}`
+        : undefined,
+      author: get(post, `['dc:creator'][0]`),
+      date: moment(get(post, 'pubDate[0]')).format(),
+      categories: `[${post.category.map(
+        (category, categoriesIndex) =>
+          `${categoriesIndex > 0 ? ' ' : ''}"${category._}"`,
+      )}]`,
+      slug: get(post, `['wp:post_name'][0]`) || undefined,
+      excerpt: get(post, `['excerpt:encoded'][0]`)
+        ? `"${get(post, `['excerpt:encoded'][0]`)}"`
+        : undefined,
+      draft: get(post, `['wp:status'][0]`) !== 'publish',
+      meta_title: `"${getMeta('_yoast_wpseo_title', get(post, 'title[0]'))}"`,
+      twitter_shares: getMeta('essb_c_twitter'),
+      facebook_shares: getMeta('essb_c_facebook'),
+      kksr_ratings: getMeta('_kksr_ratings'),
+      kksr_casts: getMeta('_kksr_casts'),
+    };
+
+    return writing(header, images, content, destination);
+  });
 };
 
 module.exports = { dataWrangle: dataWrangle };
