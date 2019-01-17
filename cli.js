@@ -1,15 +1,17 @@
 #!/usr/bin/env node -r esm
 
-import fs from 'fs';
-import parser from 'xml2js';
-import chalk from 'chalk';
-import inquirer from 'inquirer';
-
-import helperFunctions from './functions';
-
+// FS-Extra in order to enable promises
+const fs = require('fs');
+const path = require('path');
+const args = process.argv;
+const parser = require('xml2js');
+const inquirer = require('inquirer');
+// Custom Styling for Command Line printing
+const log = console.log;
+const chalk = require('chalk');
 const error = chalk.bold.red;
 const success = chalk.bold.green.inverse;
-const { log } = console;
+const helperFunctions = require('./functions');
 
 (async () => {
   const args = process.argv;

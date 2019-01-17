@@ -1,8 +1,8 @@
-import fs from 'fs-extra';
-import fetch from 'node-fetch';
-import path from 'path';
-import shortid from 'shortid';
-import chalk from 'chalk';
+const fs = require('fs-extra');
+const fetch = require('node-fetch');
+const path = require('path');
+const shortid = require('shortid');
+const chalk = require('chalk');
 
 const success = chalk.bold.green.inverse;
 const { log } = console;
@@ -67,4 +67,4 @@ function writing(header, images, content, dest) {
   );
 }
 
-export default writing;
+module.exports = writing;

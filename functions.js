@@ -1,13 +1,10 @@
-import cheerio from 'cheerio';
-import TurndownService from 'turndown';
-import chalk from 'chalk';
-import { get, findIndex } from 'lodash';
-import moment from 'moment';
 
-import writing from './writing';
-
-// Custom Styling for Command Line printing
-
+const cheerio = require('cheerio');
+const { get, findIndex } = require('lodash');
+const chalk = require('chalk');
+const moment = require('moment');
+const TurndownService = require('turndown');
+const writing = require('./writing')
 const { log } = console;
 const { yellow: progress } = chalk;
 
@@ -44,7 +41,7 @@ turndownService.addRule('code-tags', {
   },
 });
 
-// Strong tag fixes
+// Strong tag fix es
 turndownService.addRule('strong', {
   filter: 'strong',
   replacement(content) {
@@ -77,7 +74,6 @@ const parseImages = value => {
       ...rest,
     }))
     .toArray();
-
   return images;
 };
 
@@ -147,4 +143,4 @@ const dataWrangle = async (data, destination) => {
   });
 };
 
-export default { dataWrangle };
+module.exports = { dataWrangle: dataWrangle };
