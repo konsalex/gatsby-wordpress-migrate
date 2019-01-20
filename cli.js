@@ -1,4 +1,4 @@
-#!/usr/bin/env node -r esm
+#!/usr/bin/env node
 
 // FS-Extra in order to enable promises
 const fs = require('fs');
