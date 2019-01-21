@@ -1,10 +1,10 @@
-
 const cheerio = require('cheerio');
 const { get, findIndex } = require('lodash');
 const chalk = require('chalk');
 const moment = require('moment');
 const TurndownService = require('turndown');
-const writing = require('./writing')
+const writing = require('./writing');
+
 const { log } = console;
 const { yellow: progress } = chalk;
 
@@ -115,6 +115,13 @@ const dataWrangle = async (data, destination) => {
 
     content = turndownService.turndown(content);
 
+    const categories = post.category
+      ? `[${post.category.map(
+          (category, categoriesIndex) =>
+            `${categoriesIndex > 0 ? ' ' : ''}"${category._}"`,
+        )}]`
+      : '';
+
     const header = {
       layout: 'post',
       title: `"${get(post, 'title[0]')}"`,
@@ -123,10 +130,7 @@ const dataWrangle = async (data, destination) => {
         : undefined,
       author: get(post, `['dc:creator'][0]`),
       date: moment(get(post, 'pubDate[0]')).format(),
-      categories: `[${post.category.map(
-        (category, categoriesIndex) =>
-          `${categoriesIndex > 0 ? ' ' : ''}"${category._}"`,
-      )}]`,
+      categories,
       slug: get(post, `['wp:post_name'][0]`) || undefined,
       excerpt: get(post, `['excerpt:encoded'][0]`)
         ? `"${get(post, `['excerpt:encoded'][0]`)}"`
@@ -143,4 +147,4 @@ const dataWrangle = async (data, destination) => {
   });
 };
 
-module.exports = { dataWrangle: dataWrangle };
+module.exports = { dataWrangle };

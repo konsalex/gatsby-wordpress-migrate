@@ -290,14 +290,6 @@ Using Scrapy as a web crawler only is like turn around in the pretty nice featur
 		<wp:post_type><![CDATA[post]]></wp:post_type>
 		<wp:post_password><![CDATA[]]></wp:post_password>
 		<wp:is_sticky>0</wp:is_sticky>
-		<category domain="post_tag" nicename="ajax"><![CDATA[ajax]]></category>
-		<category domain="post_tag" nicename="bruteforce"><![CDATA[bruteforce]]></category>
-		<category domain="post_tag" nicename="concurrent"><![CDATA[concurrent]]></category>
-		<category domain="post_tag" nicename="hacking"><![CDATA[hacking]]></category>
-		<category domain="post_tag" nicename="python"><![CDATA[python]]></category>
-		<category domain="post_tag" nicename="requests"><![CDATA[requests]]></category>
-		<category domain="post_tag" nicename="scrapy"><![CDATA[scrapy]]></category>
-		<category domain="category" nicename="uncategorized"><![CDATA[Uncategorized]]></category>
 		<wp:postmeta>
 			<wp:meta_key><![CDATA[_edit_last]]></wp:meta_key>
 			<wp:meta_value><![CDATA[1]]></wp:meta_value>
