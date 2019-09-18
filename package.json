@@ -9,7 +9,8 @@
   "scripts": {
     "test": "jest",
     "format": "prettier --trailing-comma es5 --single-quote --write '**/*.js'",
-    "lint": "eslint . -c .eslintrc --ext js"
+    "lint": "eslint . -c .eslintrc --ext js",
+    "semantic-release": "semantic-release"
   },
   "keywords": [
     "gatsby",
@@ -46,6 +47,7 @@
     "eslint-plugin-prettier": "^3.0.1",
     "eslint-plugin-react": "^7.12.3",
     "jest": "23.6.0",
-    "prettier": "^1.15.3"
+    "prettier": "^1.15.3",
+    "semantic-release": "^15.13.24"
   }
 }

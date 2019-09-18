@@ -45,7 +45,7 @@ turndownService.addRule('code-tags', {
 turndownService.addRule('strong', {
   filter: 'strong',
   replacement(content) {
-    return `**${content.trim()}**`;
+    return `**${content}**`;
   },
 });
 
