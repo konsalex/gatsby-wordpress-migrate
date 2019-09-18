@@ -1,6 +1,6 @@
 {
   "name": "gatsby-wordpress-migrate",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Simple Node Script for converting Wordpress XML export of Posts to Gatsby blogposts 🤟",
   "main": "cli.js",
   "bin": {
@@ -10,7 +10,7 @@
     "test": "jest",
     "format": "prettier --trailing-comma es5 --single-quote --write '**/*.js'",
     "lint": "eslint . -c .eslintrc --ext js",
-    "semantic-release": "semantic-release"
+    " ": "semantic-release"
   },
   "keywords": [
     "gatsby",
